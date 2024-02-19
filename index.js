@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const hbs = require('hbs');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 
@@ -18,6 +19,10 @@ app.use(express.json());
 // Middleware для обработки тела запроса
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+// Middleware для работы с cookies
+app.use(cookieParser());
+
 
 // Подключение к MongoDB
 mongoose.connect('mongodb://127.0.0.1:27017/school-project')
@@ -67,16 +72,28 @@ course.save()
 // Маршрут для главной страницы
 app.get('/', async (req, res) => {
   try {
-    // Запрос курса из базы данных (в реальном приложении это будет запрос к базе данных)
+    // Проверка аутентификации пользователя
+    const userId = req.cookies.userId;
+    if (!userId) {
+      return res.redirect('/login');
+    }
+
+    // Получение информации о текущем пользователе из базы данных
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).send('Пользователь не найден');
+    }
+    
+    // Запрос курсов из базы данных
     const courses = await Course.find({});
     
     if (courses.length > 0) {
-      res.render('index', { title: 'Главная страница', courses: courses });
+      res.render('index', { title: 'Главная страница', user: user, courses: courses });
     } else {
-      res.render('index', { title: 'Главная страница', noCourses: true });
+      res.render('index', { title: 'Главная страница', user: user, noCourses: true });
     }
   } catch (error) {
-    console.error('[ERROR] -- Ошибка при получении курсов из базы данных:', error);
+    console.error('[ERROR] -- Ошибка при получении данных:', error);
     res.status(500).send('Ошибка сервера');
   }
 });
@@ -89,6 +106,11 @@ app.get('/login',  (req, res) => {
 // Маршрут для регистрации
 app.get('/register',  (req, res) => {
   res.render('register.hbs');
+});
+
+// Маршрут для перехода к профилю
+app.get('/profile',  (req, res) => {
+  res.render('profile.hbs');
 });
 
 // Регистрация пользователя
@@ -117,12 +139,17 @@ app.post('/auth', async (req, res) => {
     if (!isPasswordValid) {
       return res.status(401).send('Неверный пароль');
     }
+    
+    // Устанавливаем cookie после успешной аутентификации
+    res.cookie('userId', user._id, { httpOnly: true });
+    
     res.status(200).redirect(`/`);
   } catch (error) {
     console.error(error);
     res.status(500).send('Ошибка сервера');
   }
 });
+
 
 // Начало прослушивания сервера
 const PORT = process.env.PORT || 80;
