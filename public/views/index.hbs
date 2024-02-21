@@ -9,9 +9,9 @@
 </head>
 <body>
   <!-- Навигационное меню -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top mb-5">
     <div class="container">
-      <a class="navbar-brand" href="#">Образовательный сайт</a>
+      <a class="navbar-brand" href="/">Образовательный сайт</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -21,11 +21,15 @@
           <li class="nav-item">
             <a class="nav-link" href="/profile"><i class="fas fa-user"></i> Профиль</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/logout"><i class="fas fa-user"></i> Выйти</a>
+          </li>
         </ul>
       </div>
     </div>
   </nav>
 
+  <!-- Список курсов -->
   <div class="container mt-5">
     {{#if courses.length}}
       <h2>Ваши курсы:</h2>
@@ -41,5 +45,8 @@
   </div>
 
   <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

@@ -150,6 +150,13 @@ app.post('/auth', async (req, res) => {
   }
 });
 
+// Маршрут для выхода из профиля
+app.get('/logout', (req, res) => {
+  // Удаление cookies
+  res.clearCookie('userId');
+  // Перенаправление на страницу аутентификации
+  res.redirect('/login');
+});
 
 // Начало прослушивания сервера
 const PORT = process.env.PORT || 80;
