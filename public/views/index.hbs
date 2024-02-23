@@ -6,6 +6,8 @@
   <title>{{title}}</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="css/index.css">
+  <!-- Подключение файла JavaScript -->
+  <script src="js/logout.js"></script>
 </head>
 <body>
   <!-- Навигационное меню -->
@@ -22,7 +24,7 @@
             <a class="nav-link" href="/profile"><i class="fas fa-user"></i> Профиль</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/logout"><i class="fas fa-user"></i> Выйти</a>
+            <a class="nav-link" onclick="confirmLogout()"><i class="fas fa-user"></i> Выйти</a>
           </li>
         </ul>
       </div>
