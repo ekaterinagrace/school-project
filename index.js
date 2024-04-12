@@ -34,40 +34,26 @@ mongoose.connect('mongodb://127.0.0.1:27017/school-project')
   });
 
 // Определение модели курса (в реальном приложении это будет импорт из файла с моделями)
-const CourseSchema = new mongoose.Schema({
-  name: { type: String, required: true, unique: true },
-  description: String
-});
-
 // Модель пользователя
 const User = mongoose.model('User', {
   username: String,
   email: { type: String, unique: true },
   password: String,
+  ownerCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }], // Курсы, которые пользователь создал
+  teacherCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }], // Курсы, на которых пользователь является преподавателем
+  studentCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }] // Курсы, на которых пользователь является студентом
+});
+
+// Модель курса
+const CourseSchema = new mongoose.Schema({
+  name: { type: String, required: true, unique: true },
+  description: String,
+  owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Владелец курса
+  teacher: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // Преподаватель курса
+  students: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] // Студенты курса
 });
 
 const Course = mongoose.model('Course', CourseSchema);
-
-// Создание курса (в реальном приложении это будет добавление курса в базу данных)
-const course = new Course({
-  name: 'Программирование на Node.js',
-  description: 'Изучение разработки веб-приложений на Node.js'
-});
-
-// Сохранение курса в базе данных
-course.save()
-  .then(() => {
-    console.log('[INFO] -- Курс успешно создан и сохранен в базе данных');
-  })
-  .catch((error) => {
-    if (error.code === 11000) {
-      console.error('[WARNING] -- Ошибка при создании и сохранении курса в базе данных: Курс с таким именем уже существует');
-    } else {
-      console.error('[ERROR] -- Ошибка при создании и сохранении курса в базе данных:', error);
-    }
-});
-
-
 
 // Маршрут для главной страницы
 app.get('/', async (req, res) => {
@@ -156,6 +142,27 @@ app.get('/logout', (req, res) => {
   res.clearCookie('userId');
   // Перенаправление на страницу аутентификации
   res.redirect('/login');
+});
+
+// Маршрут для добавления курса
+app.post('/create-course', async (req, res) => {
+  try {
+    const { name, description } = req.body;
+    const ownerId = req.cookies.userId; // Получение идентификатора текущего пользователя из cookies
+    const course = new Course({ name, description, owner: ownerId }); // Преобразуем строковый ownerId в ObjectId
+    // Сохранение курса в базе данных
+    await course.save();
+    console.log('[INFO] -- Курс успешно создан и сохранен в базе данных');
+    res.status(201).redirect('/');
+  } catch (error) {
+    console.error('[ERROR] -- Ошибка при добавлении курса:', error);
+    res.status(500).send('Ошибка сервера');
+  }
+});
+
+// Маршрут для страницы создания нового курса
+app.get('/add-course', (req, res) => {
+  res.render('add-course', { title: 'Создание нового курса' });
 });
 
 // Начало прослушивания сервера
