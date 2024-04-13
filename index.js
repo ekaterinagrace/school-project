@@ -49,7 +49,7 @@ const CourseSchema = new mongoose.Schema({
   name: { type: String, required: true, unique: true },
   description: String,
   owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Владелец курса
-  teacher: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // Преподаватель курса
+  teachers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], // Преподаватель курса
   students: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] // Студенты курса
 });
 
@@ -148,8 +148,24 @@ app.get('/logout', (req, res) => {
 app.post('/create-course', async (req, res) => {
   try {
     const { name, description } = req.body;
-    const ownerId = req.cookies.userId; // Получение идентификатора текущего пользователя из cookies
-    const course = new Course({ name, description, owner: ownerId }); // Преобразуем строковый ownerId в ObjectId
+    const ownerId = req.cookies.userId;  // Получаем ownerId из cookies
+
+    const courseData = {
+      name,
+      description,
+      owner: ownerId
+    };
+
+    // Добавляем преподавателей и студентов, если они указаны
+    if (req.body.teachers) {
+      courseData.teachers = req.body.teachers.split(',').map(id => new mongoose.Types.ObjectId(id.trim()));
+    }
+
+    if (req.body.students) {
+      courseData.students = req.body.students.split(',').map(id => new mongoose.Types.ObjectId(id.trim()));
+    }
+
+    const course = new Course(courseData);
     // Сохранение курса в базе данных
     await course.save();
     console.log('[INFO] -- Курс успешно создан и сохранен в базе данных');
@@ -164,6 +180,28 @@ app.post('/create-course', async (req, res) => {
 app.get('/add-course', (req, res) => {
   res.render('add-course', { title: 'Создание нового курса' });
 });
+
+// Маршрут для страницы курса
+app.get('/course/:id', async (req, res) => {
+  try {
+    const courseId = req.params.id;
+    const course = await Course.findById(courseId)
+                               .populate('owner')
+                               .populate('teachers')
+                               .populate('students');
+    
+    if (!course) {
+      return res.status(404).send('Курс не найден');
+    }
+    
+    res.render('course', { title: course.name, course: course });
+  } catch (error) {
+    console.error('[ERROR] -- Ошибка при загрузке курса:', error);
+    res.status(500).send('Ошибка сервера');
+  }
+});
+
+
 
 // Начало прослушивания сервера
 const PORT = process.env.PORT || 80;

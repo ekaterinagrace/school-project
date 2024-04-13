@@ -44,13 +44,13 @@
   <br>
 
 
-  <!-- Список курсов -->
+    <!-- Список курсов -->
   <div class="container mt-5">
     {{#if courses.length}}
       <h2>Ваши курсы:</h2>
       {{#each courses}}
         <div class="course-box">
-          <h3>{{this.name}}</h3>
+          <h3><a href="/course/{{this._id}}">{{this.name}}</a></h3>
           <p>{{this.description}}</p>
         </div>
       {{/each}}
@@ -58,6 +58,7 @@
       <h2>Вы не записаны ни на один курс</h2>
     {{/if}}
   </div>
+
 
   <script src="https://kit.fontawesome.com/a076d05399.js"></script>
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

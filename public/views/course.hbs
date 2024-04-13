@@ -1,0 +1,85 @@
+<!-- profile.hbs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Профиль пользователя</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/course.css">
+  <!-- Подключение файла JavaScript -->
+  <script src="js/logout.js"></script>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top mb-5">
+    <div class="container">
+      <a class="navbar-brand" href="/">Образовательный сайт</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/profile"><i class="fas fa-user"></i> Профиль</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link cursor-pointer" onclick="confirmLogout()"><i class="fas fa-user"></i> Выйти</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <br>
+
+  <div class="container-fluid mt-5">
+    <div class="row row-cols-2 row-cols-lg-5 g-2 g-lg-3">
+      <!-- Колонка для карточек -->
+      <div class="col-md-9 d-flex flex-wrap p-5">
+        <!-- Карточка -->
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">{{course.name}}</h5>
+            <p class="card-text">{{course.description}}</p>
+          </div>
+        </div>
+      </div>
+      <!-- Колонка для списка пользователей -->
+      <div class="col-md-3">
+
+        {{#if course.owner}}
+        <h6 class="badge badge-secondary mt-3 mb-2">Владелец</h6>
+        <div class="px-2">
+          <div class="font-weight-bold">{{course.owner.username}}</div>
+        </div>
+        {{/if}}
+
+        {{#if course.teachers}}
+        <h6 class="badge badge-secondary mt-3 mb-2">Преподаватели</h6>
+        <div class="px-2">
+          {{#each course.teachers}}
+          <div class="font-weight-bold">{{this.username}}</div>
+          {{/each}}
+        </div>
+        {{/if}}
+
+        {{#if course.students}}
+        <h6 class="badge badge-secondary mt-3 mb-2">Студенты</h6>
+        <div class="px-2">
+          {{#each course.students}}
+          <div class="font-weight-bold">{{this.username}}</div>
+          {{/each}}
+        </div>
+        {{/if}}
+
+      </div>
+    </div>
+  </div>
+ 
+  <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
